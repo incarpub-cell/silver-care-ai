@@ -107,7 +107,7 @@ def get_ai_response(prompt):
 def main():
     # Sidebar: Admin Tools
     with st.sidebar:
-        st.title("👨💼 관리자 도구")
+        st.title("🛠️ 관리자 도구 ⚙️")
         if st.checkbox("SNS 마케팅 카피 생성기"):
             st.subheader("📢 인스타그램/X 홍보 문구")
             topic = st.text_input("홍보 할 핵심 키워드", value="2026 돌봄통합지원법")
@@ -119,6 +119,26 @@ def main():
                         st.info(copy_result)
 
     # Main Landing Section
+    # Hero Banner (Representative's Custom Image)
+    import os
+    hero_path = "assets/hero.jpg" # 또는 .png
+    if not os.path.exists("assets"):
+        os.makedirs("assets")
+        
+    if os.path.exists(hero_path):
+        st.image(hero_path, use_container_width=True, caption="AI와 함께하는 행복한 노후")
+    else:
+        # 파일이 아직 없을 때 보여줄 안내 및 기본 스타일
+        st.markdown(f"""
+            <div style="width: 100%; height: 250px; background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); 
+                        border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+                        border: 2px dashed #4CAF50; margin-bottom: 20px;">
+                <h3 style="color: #2E7D32; margin-bottom: 10px;">📸 대표님의 명품 이미지를 보여주세요!</h3>
+                <p style="color: #555; font-size: 0.9rem;">방금 보내주신 이미지를 <b>assets/hero.jpg</b>로 저장해 주시면</p>
+                <p style="color: #555; font-size: 0.9rem;">여기에 바로 나타납니다! 🫡</p>
+            </div>
+        """, unsafe_allow_html=True)
+    
     st.title("실버케어 AI 가이드")
     st.markdown("#### **내 부모님을 위한 가장 따뜻한 법률 솔루션**")
     
