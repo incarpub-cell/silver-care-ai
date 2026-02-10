@@ -1,15 +1,14 @@
 import streamlit as st
-import google.generativeai as genai
-import time
 
-# --- Page Config ---
+# --- Page Config (Must be first) ---
 st.set_page_config(
     page_title="2026 실버케어 AI 가이드",
     page_icon="👵",
     layout="centered"
 )
 
-# --- Meta Tags for SEO/Social Sharing (Open Graph) ---
+# --- Meta Tags & CSS (Optimized) ---
+# Added font-display:swap for better performance
 st.markdown("""
 <head>
     <meta property="og:title" content="2026 실버케어 AI 가이드">
@@ -17,12 +16,8 @@ st.markdown("""
     <meta property="og:image" content="https://raw.githubusercontent.com/wonseokjung/solopreneur-ai-agents/main/agents/kodari/assets/kodari_success.png">
     <meta property="og:url" content="https://silver-care-ai.streamlit.app">
 </head>
-""", unsafe_allow_html=True)
-
-# --- Custom CSS (Premium Glassmorphism & Modern Soft Palettes) ---
-st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=Noto+Sans+KR:wght@300;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=Noto+Sans+KR:wght@300;500;700&display=swap&font-display=swap');
     
     html, body, [class*="css"] {
         font-family: 'Noto Sans KR', 'Outfit', sans-serif;
@@ -93,7 +88,14 @@ def load_policy_data():
 
 @st.cache_resource
 def get_ai_model():
+    # Move heavy import inside function to speed up initial app load
+    import google.generativeai as genai
     try:
+        # Check if key exists in secrets
+        if "GEMINI_API_KEY" not in st.secrets:
+            st.error("🔑 **GEMINI_API_KEY**를 찾을 수 없습니다! 스트림릿 클라우드 설정(Settings -> Secrets)에 키를 추가해 주세요.")
+            return None
+            
         api_key = st.secrets["GEMINI_API_KEY"]
         genai.configure(api_key=api_key)
         
