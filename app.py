@@ -9,6 +9,16 @@ st.set_page_config(
     layout="centered"
 )
 
+# --- Meta Tags for SEO/Social Sharing (Open Graph) ---
+st.markdown("""
+<head>
+    <meta property="og:title" content="2026 실버케어 AI 가이드">
+    <meta property="og:description" content="우리 부모님 맞춤형 2026 돌봄 혜택, 1분 만에 확인하세요">
+    <meta property="og:image" content="https://raw.githubusercontent.com/wonseokjung/solopreneur-ai-agents/main/agents/kodari/assets/kodari_success.png">
+    <meta property="og:url" content="https://silver-care-ai.streamlit.app">
+</head>
+""", unsafe_allow_html=True)
+
 # --- Custom CSS (Premium Glassmorphism & Modern Soft Palettes) ---
 st.markdown("""
 <style>
@@ -72,15 +82,17 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- AI Configuration ---
+# --- AI Configuration & Caching ---
+@st.cache_data
 def load_policy_data():
     try:
         with open("data/policy_2026.md", "r", encoding="utf-8") as f:
             return f.read()
-    except:
-        return ""
+    except Exception as e:
+        return f"정책 데이터를 불러오는 중 오류가 발생했습니다: {str(e)}"
 
-def get_ai_response(prompt):
+@st.cache_resource
+def get_ai_model():
     try:
         api_key = st.secrets["GEMINI_API_KEY"]
         genai.configure(api_key=api_key)
@@ -95,12 +107,21 @@ def get_ai_response(prompt):
         
         당신의 목표는 보호자(4050 자녀)에게 희망을 주고 정확한 정보를 제공하는 것입니다.
         """
-        
         model = genai.GenerativeModel('gemini-flash-latest', system_instruction=system_instruction)
+        return model
+    except Exception as e:
+        st.error(f"⚠️ AI 모델 초기화 실패: {str(e)}")
+        return None
+
+def get_ai_response(prompt):
+    model = get_ai_model()
+    if not model:
+        return None
+    try:
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
-        st.error(f"⚠️ API 연결에 실패했습니다 (할당량 부족 등): {str(e)}")
+        st.error(f"⚠️ 인공지능 응답 생성 중 오류가 발생했습니다: {str(e)}")
         return None
 
 # --- App Logic ---
@@ -122,6 +143,7 @@ def main():
     # Hero Banner (Multi-format & Case-insensitive Detection)
     import os
     
+    @st.cache_data
     def find_hero_image():
         # 확인할 파일명 후보들
         base_names = ["hero", "HERO", "Hero"]
