@@ -119,23 +119,36 @@ def main():
                         st.info(copy_result)
 
     # Main Landing Section
-    # Hero Banner (Representative's Custom Image)
+    # Hero Banner (Multi-format & Case-insensitive Detection)
     import os
-    hero_path = "assets/hero.jpg" # 또는 .png
-    if not os.path.exists("assets"):
-        os.makedirs("assets")
+    
+    def find_hero_image():
+        # 확인할 파일명 후보들
+        base_names = ["hero", "HERO", "Hero"]
+        extensions = [".jpg", ".jpeg", ".png", ".JPG", ".PNG", ".JPEG"]
+        search_dirs = ["", "assets/"] # 루트와 assets 폴더 모두 확인
         
-    if os.path.exists(hero_path):
-        st.image(hero_path, use_container_width=True, caption="AI와 함께하는 행복한 노후")
+        for sd in search_dirs:
+            for bn in base_names:
+                for ext in extensions:
+                    path = f"{sd}{bn}{ext}"
+                    if os.path.exists(path):
+                        return path
+        return None
+
+    hero_file = find_hero_image()
+    
+    if hero_file:
+        st.image(hero_file, use_container_width=True, caption="AI와 함께하는 행복한 노후")
     else:
-        # 파일이 아직 없을 때 보여줄 안내 및 기본 스타일
+        # 파일이 없을 때 보여줄 안내 (문구가 바뀌었는지 확인용)
         st.markdown(f"""
-            <div style="width: 100%; height: 250px; background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); 
+            <div style="width: 100%; height: 250px; background: linear-gradient(135deg, #F1F8E9 0%, #DCEDC8 100%); 
                         border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
-                        border: 2px dashed #4CAF50; margin-bottom: 20px;">
-                <h3 style="color: #2E7D32; margin-bottom: 10px;">📸 대표님의 명품 이미지를 보여주세요!</h3>
-                <p style="color: #555; font-size: 0.9rem;">방금 보내주신 이미지를 <b>assets/hero.jpg</b>로 저장해 주시면</p>
-                <p style="color: #555; font-size: 0.9rem;">여기에 바로 나타납니다! 🫡</p>
+                        border: 2px dashed #8BC34A; margin-bottom: 20px;">
+                <h3 style="color: #33691E; margin-bottom: 10px;">✨ 대표님의 명품 이미지를 기다리고 있습니다!</h3>
+                <p style="color: #555; font-size: 0.9rem;"><b>hero.jpg</b> 파일을 깃허브 메인 폴더에 올려주세요.</p>
+                <p style="color: #777; font-size: 0.8rem;">(현재 최신 코드가 적용된 상태입니다 🫡)</p>
             </div>
         """, unsafe_allow_html=True)
     
