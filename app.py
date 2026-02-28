@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 
 # --- Page Config (Must be first) ---
 st.set_page_config(
@@ -177,7 +178,8 @@ def main():
         """, unsafe_allow_html=True)
     
     st.title("실버케어 AI 가이드")
-    st.markdown("#### **내 부모님을 위한 가장 따뜻한 법률 솔루션**")
+    st.markdown("#### **내 부모님을 위한 가장 따뜻한 돌봄 솔루션**")
+    st.markdown("'돌봄통합지원법' 시행 전 우리 부모님이 받을 수 있는 최적의\n서비스를 확인해 보세요~!!")
     
     # NEW: 2026 Law Info Box with improved style
     with st.container():
@@ -261,8 +263,40 @@ def main():
                         st.balloons()
                         st.success("대표님께 알림이 전송되었습니다! 전문가가 곧 연락드립니다.")
                 with col_c2:
-                    if st.button("💳 프리미엄 가이드북 평생 구독"):
-                        st.toast("프리미엄 회원 전용 페이지로 이동합니다.")
+                    if "paypal" in st.secrets:
+                        paypal_client_id = st.secrets["paypal"]["client_id"]
+                        paypal_html = f"""
+                        <div id="paypal-button-container"></div>
+                        <script src="https://www.paypal.com/sdk/js?client-id={paypal_client_id}&currency=USD"></script>
+                        <script>
+                          paypal.Buttons({{
+                            style: {{
+                                layout: 'vertical',
+                                color:  'blue',
+                                shape:  'rect',
+                                label:  'paypal'
+                            }},
+                            createOrder: function(data, actions) {{
+                              return actions.order.create({{
+                                purchase_units: [{{
+                                  amount: {{
+                                    value: '29.99'
+                                  }}
+                                }}]
+                              }});
+                            }},
+                            onApprove: function(data, actions) {{
+                              return actions.order.capture().then(function(details) {{
+                                window.parent.postMessage({{type: 'paypal_success', details: details}}, '*');
+                              }});
+                            }}
+                          }}).render('#paypal-button-container');
+                        </script>
+                        """
+                        components.html(paypal_html, height=150)
+                    else:
+                        if st.button("💳 프리미엄 가이드북 평생 구독"):
+                            st.toast("프리미엄 회원 전용 페이지로 이동합니다.")
 
     # Newsletter Footer
     st.write("---")
@@ -277,7 +311,7 @@ def main():
 
     st.markdown("""
     <div style="text-align: center; color: #888; font-size: 0.8rem; margin-top: 50px;">
-        © 2026 실버케어 AI 가이드 | 대표님의 비즈니스를 열렬히 응원합니다! 🫡
+        © 2026 실버케어 AI 가이드🫡
     </div>
     """, unsafe_allow_html=True)
 
